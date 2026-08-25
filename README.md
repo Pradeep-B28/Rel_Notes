@@ -52,6 +52,10 @@ Most developers just copy-paste commit messages and call it a day—which is use
 
 ## 🎥 Demo
 
+*(Pro Tip: Replace this placeholder with a GIF of you running `relnotes` in your terminal!)*
+
+![Demo Placeholder](https://via.placeholder.com/800x400/0D1117/FFFFFF?text=GIF:+Running+relnotes+in+Terminal)
+
 **Example Output:**
 ```markdown
 ## Release Notes (Professional)
@@ -66,3 +70,5 @@ Most developers just copy-paste commit messages and call it a day—which is use
 
 ### 🧹 Chores
 - Updated dependencies to latest versions.
+```
+

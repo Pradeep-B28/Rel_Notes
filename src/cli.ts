@@ -21,10 +21,10 @@ program
   .option('-o, --output <file>', 'Output to a file instead of stdout')
   .action(async (fromArg, toArg, options) => {
     try {
-      if (!process.env.OPENAI_API_KEY) {
-        console.error('❌ OPENAI_API_KEY not set in .env file');
-        process.exit(1);
-      }
+if (!process.env.GROQ_API_KEY) {
+  console.error('❌ GROQ_API_KEY not set in .env file');
+  process.exit(1);
+}
 
       const tone = options.tone as Tone;
       if (!['professional', 'funny', 'concise'].includes(tone)) {

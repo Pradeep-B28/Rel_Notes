@@ -1,8 +1,14 @@
+import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { Commit, Tone } from './types';
 
+// Load environment variables
+dotenv.config();
+
+// Initialize OpenAI client but point it to Groq's API endpoint
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.GROQ_API_KEY, // Your Groq key (starts with gsk_)
+  baseURL: 'https://api.groq.com/openai/v1', // Groq's compatible endpoint
 });
 
 export async function generateReleaseNotes(commits: Commit[], tone: Tone): Promise<string> {
@@ -35,7 +41,7 @@ If funny, add a "TL;DR" section at the top.
 `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: 'llama-3.3-70b-versatile', // Groq's flagship free model (as good as GPT-4)
     messages: [
       { role: 'system', content: 'You are an expert technical writer.' },
       { role: 'user', content: prompt },
