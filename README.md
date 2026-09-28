@@ -2,79 +2,143 @@
 
 # 📝 relnotes — AI-Powered Release Notes CLI Generator
 
-### *Stop Writing Changelogs Manually. Let AI Generate Structured Release Notes in 1 Second.*
+### *Stop Writing Changelogs Manually. Let Groq Llama 3 Transform Git Commits into Enterprise Release Notes in Seconds.*
 
-[![npm version](https://badge.fury.io/js/relnotes.svg)](https://badge.fury.io/js/relnotes)
 [![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Groq API](https://img.shields.io/badge/Groq-Free%20API-f55036?style=for-the-badge)](https://console.groq.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Groq API](https://img.shields.io/badge/LLM-Groq%20Llama%203.3%2070B-f55036?style=for-the-badge)](https://console.groq.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-quick-usage">Quick Usage</a> •
-  <a href="#-cli-options">CLI Options</a>
+  <a href="#-overview">Overview</a> •
+  <a href="#-key-features">Key Features</a> •
+  <a href="#-installation--setup">Setup</a> •
+  <a href="#-cli-usage--examples">Usage & Examples</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-license--copyright">License & Copyright</a>
 </p>
-
----
 
 </div>
 
-> [!TIP]
-> **relnotes** uses high-speed Groq LLM inference to analyze your recent `git log` commits, group them logically (Features, Fixes, Refactors, Breaking Changes), and format them into clean Markdown.
+---
+
+## 💡 Overview
+
+**relnotes** automates the changelog authoring workflow. By interfacing directly with local Git history via `simple-git` and dispatching commit logs to **Groq's ultra-low latency Llama-3.3-70B model**, **relnotes** produces professional, structured markdown release notes within seconds.
 
 ---
 
-## ⚡ Features
+## ⚡ Key Features
 
-- 🚀 **Lightning Fast**: Powered by Groq's Llama 3 70B inference engine (sub-second release note generation).
-- 🏷️ **Smart Commit Categorization**: Automatically groups commits into `Features`, `Bug Fixes`, `Performance Boosts`, and `Breaking Changes`.
-- 🔍 **Git Tag Awareness**: Analyzes commits between specified tags (`--since v1.0.0 --until v1.2.0`).
-- 📄 **Flexible Export**: Outputs directly to terminal stdout or appends to `CHANGELOG.md`.
+- ⚡ **Ultra-Fast AI Inference**: Powered by Groq's LPU inference engine running `llama-3.3-70b-versatile`.
+- 🏷️ **Automated Semantic Grouping**: Categorizes raw commits into Features, Bug Fixes, Refactors, and Breaking Changes.
+- 🎭 **Customizable Tones**:
+  - `professional`: Structured enterprise changelog format grouped by domain.
+  - `concise`: High-density bulleted summary with zero fluff (max 5 lines).
+  - `funny`: Humorous, Slack/pirate-style release announcement with TL;DR and emojis.
+- 🎯 **Flexible Git Range Resolution**: Compares any two tags or branches, or auto-detects changes between the two most recent git tags.
+- 📄 **Direct File Output**: Outputs directly to stdout or writes directly to `CHANGELOG.md` or release files.
 
 ---
 
 ## 🚀 Installation & Setup
 
-```bash
-# Global installation via npm
-npm install -g relnotes
+### Prerequisites
+- Node.js 18.0.0 or higher.
+- A free [Groq Cloud API Key](https://console.groq.com/keys).
 
-# Or run directly via npx
-npx relnotes
+### Local Installation & Build
+
+```powershell
+# 1. Clone repository
+git clone https://github.com/Pradeep-B28/Rel_Notes.git
+cd Rel_Notes
+
+# 2. Install dependencies
+npm install
+
+# 3. Build TypeScript to dist/
+npm run build
+
+# 4. Link CLI globally
+npm link
 ```
 
-### Get a Free Groq API Key
-Set your `GROQ_API_KEY` environment variable:
+### Environment Configuration
 
-```bash
-# Linux/macOS
-export GROQ_API_KEY="gsk_..."
+Configure your `GROQ_API_KEY`:
 
-# Windows PowerShell
-$env:GROQ_API_KEY="gsk_..."
+```powershell
+# In PowerShell:
+$env:GROQ_API_KEY = "gsk_your_groq_api_key_here"
+
+# Or create a .env file in the project root:
+GROQ_API_KEY=gsk_your_groq_api_key_here
 ```
 
 ---
 
-## 💻 Quick Usage
+## 💻 CLI Usage & Examples
+
+### Command Syntax
 
 ```bash
-# Generate release notes for the latest 10 commits
+relnotes [from] [to] [options]
+```
+
+### Options
+
+| Option | Shorthand | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `--tone <tone>` | `-t` | Tone of generated notes (`professional`, `concise`, `funny`) | `professional` |
+| `--output <file>` | `-o` | Target file path to write release notes to | `stdout` |
+| `--help` | `-h` | Display command help and options | — |
+| `--version` | `-V` | Output CLI version | — |
+
+### Real-World Examples
+
+```bash
+# 1. Auto-detect commits between the two latest tags:
 relnotes
 
-# Generate release notes since a specific Git tag
-relnotes --since v1.0.0
+# 2. Compare a specific release tag with the current working branch:
+relnotes v1.0.0 main
 
-# Export release notes to CHANGELOG.md
-relnotes --out CHANGELOG.md
+# 3. Generate concise notes and save directly to CHANGELOG.md:
+relnotes v1.0.0 v1.1.0 --tone concise -o CHANGELOG.md
+
+# 4. Generate a fun Slack announcement:
+relnotes v1.1.0 v1.2.0 -t funny
 ```
 
 ---
 
-<div align="center">
+## 📁 Repository Architecture
 
-Crafted by **[Pradeep](https://github.com/Pradeep-B28)**
+```text
+Rel_Notes/
+├── src/
+│   ├── index.ts               # Public library export module
+│   ├── cli.ts                 # Commander CLI definition & runtime handler
+│   ├── git.ts                 # simple-git repository inspection & tag resolver
+│   ├── ai.ts                  # Groq API client & prompt engineering pipeline
+│   └── types.ts               # TypeScript data interfaces (Commit, Tone)
+├── dist/                      # Compiled JavaScript binaries
+├── tsconfig.json              # TypeScript compiler configuration
+├── package.json               # Package metadata and bin declaration
+├── LICENSE                    # MIT License with copyright
+└── README.md                  # Comprehensive documentation
+```
 
-</div>
+---
+
+## 📄 License & Copyright
+
+```
+Copyright (c) 2026 Pradeep Basha (Pradeep-B28). All Rights Reserved.
+
+Licensed under the MIT License. You may freely use, modify, and distribute
+this project under the terms of the MIT license. See the LICENSE file for details.
+```
+
+Crafted with ⚡ by **[Pradeep Basha](https://github.com/Pradeep-B28)**.
