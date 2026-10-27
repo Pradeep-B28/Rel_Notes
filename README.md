@@ -1,53 +1,60 @@
-<div align="center">
+# relnotes — AI-Powered Release Notes CLI Generator
 
-# 📝 relnotes — AI-Powered Release Notes CLI Generator
-
-### *Stop Writing Changelogs Manually. Let Groq Llama 3 Transform Git Commits into Enterprise Release Notes in Seconds.*
-
-[![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Groq API](https://img.shields.io/badge/LLM-Groq%20Llama%203.3%2070B-f55036?style=for-the-badge)](https://console.groq.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-
-<p align="center">
-  <a href="#-overview">Overview</a> •
-  <a href="#-key-features">Key Features</a> •
-  <a href="#-installation--setup">Setup</a> •
-  <a href="#-cli-usage--examples">Usage & Examples</a> •
-  <a href="#-architecture">Architecture</a> •
-  <a href="#-license--copyright">License & Copyright</a>
-</p>
-
-</div>
+> **Source Repository:** [github.com/Pradeep-B28/Rel_Notes](https://github.com/Pradeep-B28/Rel_Notes)  
+> **Author:** [B Pradeep](https://github.com/Pradeep-B28) · [Portfolio](https://pradeep-b28.github.io/Pradeep-B28/)
 
 ---
 
-## 💡 Overview
+## Overview
 
-**relnotes** automates the changelog authoring workflow. By interfacing directly with local Git history via `simple-git` and dispatching commit logs to **Groq's ultra-low latency Llama-3.3-70B model**, **relnotes** produces professional, structured markdown release notes within seconds.
+**relnotes** is a TypeScript command-line utility that inspects local Git commit histories and generates structured, categorized Markdown changelogs using Groq's high-speed inference engine (`llama-3.3-70b-versatile`).
+
+It parses git tags, extracts commit ranges via `simple-git`, groups changes by semantic conventional commit scopes, and generates tailored release notes across multiple customizable tones in under two seconds.
+
+```mermaid
+flowchart TD
+    GitRepo["Local Git Repository\n(Tags / Commits / Branches)"] --> SimpleGit["simple-git Adapter\n(Range Resolver: Tag A .. Tag B)"]
+    
+    SimpleGit --> CommitParser["Commit Log Extractor\n(Hash, Author, Conventional Message)"]
+    
+    CommitParser --> PromptEngine["Context & Tone Engine\n(professional · concise · funny)"]
+    
+    PromptEngine --> GroqAPI["Groq LPU Inference\n(llama-3.3-70b-versatile)"]
+    
+    GroqAPI --> Formatter["Markdown Formatter\n(Features · Bug Fixes · Breaking Changes)"]
+    
+    Formatter --> Stdout["stdout Console Stream"]
+    Formatter --> File["File Target (-o CHANGELOG.md)"]
+```
 
 ---
 
-## ⚡ Key Features
+## Technical Specifications
 
-- ⚡ **Ultra-Fast AI Inference**: Powered by Groq's LPU inference engine running `llama-3.3-70b-versatile`.
-- 🏷️ **Automated Semantic Grouping**: Categorizes raw commits into Features, Bug Fixes, Refactors, and Breaking Changes.
-- 🎭 **Customizable Tones**:
-  - `professional`: Structured enterprise changelog format grouped by domain.
-  - `concise`: High-density bulleted summary with zero fluff (max 5 lines).
-  - `funny`: Humorous, Slack/pirate-style release announcement with TL;DR and emojis.
-- 🎯 **Flexible Git Range Resolution**: Compares any two tags or branches, or auto-detects changes between the two most recent git tags.
-- 📄 **Direct File Output**: Outputs directly to stdout or writes directly to `CHANGELOG.md` or release files.
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Runtime & Language** | Node.js 18+, TypeScript 5.3 | Strongly typed CLI with compiled ECMAScript binaries in `dist/` |
+| **Git Integration** | `simple-git` | Native local git inspection, automatic tag resolution, and commit diff extraction |
+| **LLM Inference** | Groq Cloud API | High-throughput `llama-3.3-70b-versatile` running on Groq LPUs |
+| **CLI Framework** | Commander.js | Flag parsing, help text, option validation, and process exit handling |
 
 ---
 
-## 🚀 Installation & Setup
+## Tone Presets
+
+- **`professional` (default):** Enterprise-grade changelog formatted by engineering domain (Features, Bug Fixes, Refactors, Breaking Changes).
+- **`concise`:** High-density bulleted executive summary (maximum 5 lines).
+- **`funny`:** Playful, emoji-accented release bulletin tailored for internal developer chat announcements.
+
+---
+
+## Installation & Setup
 
 ### Prerequisites
-- Node.js 18.0.0 or higher.
-- A free [Groq Cloud API Key](https://console.groq.com/keys).
+- Node.js 18.0.0 or higher
+- A free [Groq Cloud API Key](https://console.groq.com/keys)
 
-### Local Installation & Build
+### Local Build & Installation
 
 ```powershell
 # 1. Clone repository
@@ -69,16 +76,16 @@ npm link
 Configure your `GROQ_API_KEY`:
 
 ```powershell
-# In PowerShell:
+# Windows PowerShell:
 $env:GROQ_API_KEY = "gsk_your_groq_api_key_here"
 
-# Or create a .env file in the project root:
-GROQ_API_KEY=gsk_your_groq_api_key_here
+# Linux / macOS:
+export GROQ_API_KEY="gsk_your_groq_api_key_here"
 ```
 
 ---
 
-## 💻 CLI Usage & Examples
+## CLI Usage & Examples
 
 ### Command Syntax
 
@@ -88,77 +95,31 @@ relnotes [from] [to] [options]
 
 ### Options
 
-| Option | Shorthand | Description | Default |
+| Option | Flag | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `--tone <tone>` | `-t` | Tone of generated notes (`professional`, `concise`, `funny`) | `professional` |
 | `--output <file>` | `-o` | Target file path to write release notes to | `stdout` |
 | `--help` | `-h` | Display command help and options | — |
 | `--version` | `-V` | Output CLI version | — |
 
-### Real-World Examples
+### Common Workflows
 
 ```bash
-# 1. Auto-detect commits between the two latest tags:
+# 1. Auto-detect changes between the two latest git tags
 relnotes
 
-# 2. Compare a specific release tag with the current working branch:
+# 2. Compare a release tag with the current main branch
 relnotes v1.0.0 main
 
-# 3. Generate concise notes and save directly to CHANGELOG.md:
+# 3. Generate concise changelog and append directly to CHANGELOG.md
 relnotes v1.0.0 v1.1.0 --tone concise -o CHANGELOG.md
 
-# 4. Generate a fun Slack announcement:
+# 4. Generate a fun Slack release announcement
 relnotes v1.1.0 v1.2.0 -t funny
 ```
 
 ---
 
-## 📁 Repository Architecture
+## License
 
-```text
-Rel_Notes/
-├── src/
-│   ├── index.ts               # Public library export module
-│   ├── cli.ts                 # Commander CLI definition & runtime handler
-│   ├── git.ts                 # simple-git repository inspection & tag resolver
-│   ├── ai.ts                  # Groq API client & prompt engineering pipeline
-│   └── types.ts               # TypeScript data interfaces (Commit, Tone)
-├── dist/                      # Compiled JavaScript binaries
-├── tsconfig.json              # TypeScript compiler configuration
-├── package.json               # Package metadata and bin declaration
-├── LICENSE                    # MIT License with copyright
-└── README.md                  # Comprehensive documentation
-```
-
----
-
-## 📄 License & Copyright
-
-```
-Copyright (c) 2026 Pradeep (Pradeep-B28). All Rights Reserved.
-
-Licensed under the MIT License. You may freely use, modify, and distribute
-this project under the terms of the MIT license. See the LICENSE file for details.
-```
-
-Crafted with ⚡ by **[Pradeep](https://github.com/Pradeep-B28)**.
-
----
-
-## 👨‍💻 Author & Contact
-
-**Pradeep B**  
-*Java & DSA Master Trainer | Full-Stack Architect | Web Platform Engineer*
-
-- 🌐 **Softech Career & Placement Portal:** [reachsoftech.onrender.com](https://reachsoftech.onrender.com/home)
-- 🌌 **3D Interactive Developer Portfolio:** [pradeep-b28.github.io/GIT_3D_Portfolio](https://pradeep-b28.github.io/GIT_3D_Portfolio/)
-- 💻 **GitHub Profile:** [@Pradeep-B28](https://github.com/Pradeep-B28)
-- 💼 **LinkedIn:** [linkedin.com/in/pradeepb-2k](https://www.linkedin.com/in/pradeepb-2k)
-- 📧 **Email:** [pradeepbashaa@gmail.com](mailto:pradeepbashaa@gmail.com)
-
-### 🚀 Live Web Applications & Platforms
-- 🌐 **Softech Career Portal:** [reachsoftech.onrender.com](https://reachsoftech.onrender.com/home)
-- 🗺️ **Namma Route (Tamil Nadu Transit Graph):** [nammaroute-sigma.vercel.app](https://nammaroute-sigma.vercel.app/)
-- 🎆 **Diwali Sky (Fireworks Simulator):** [diwalisky.vercel.app](https://diwalisky.vercel.app)
-- ⚪ **Life in Dots (Lifespan in Weeks):** [lifeindots.vercel.app](https://lifeindots.vercel.app)
-- 🤖 **Catch the AI (Code Review & Debug Game):** [catchtheai.vercel.app](https://catchtheai.vercel.app/)
+This project is licensed under the [MIT License](LICENSE).
